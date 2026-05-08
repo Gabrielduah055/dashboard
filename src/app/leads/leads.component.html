@@ -1,58 +1,87 @@
-<section class="mx-auto max-w-[1180px] xl:max-w-none">
-  <div class="grid min-h-[calc(100vh-3rem)] gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
-    <div class="min-w-0 border-t border-sq-line pt-7 xl:border-r xl:pr-5">
-      <h1 class="text-3xl font-bold tracking-normal text-sq-text">All Leads</h1>
+<section class="leads-shell mx-auto h-[calc(100vh-3rem)] max-w-[1440px] overflow-hidden">
+  <div class="grid h-full min-h-0 gap-5 transition-all duration-300" [ngClass]="selectedLead ? 'xl:grid-cols-[minmax(0,1fr)_430px]' : 'xl:grid-cols-1'">
+    <div class="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-sq border border-sq-line bg-white shadow-sq-card">
+      <header class="shrink-0 border-b border-sq-line px-5 py-4">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h1 class="text-2xl font-bold tracking-normal text-sq-text">Leads</h1>
+            <p class="mt-1 text-sm text-sq-muted">Showing {{ firstVisibleLead }}-{{ lastVisibleLead }} of {{ filteredLeads.length }} records</p>
+          </div>
 
-      <div class="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <label class="flex h-10 w-full items-center gap-3 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sq-muted lg:max-w-72">
-          <i class="uil uil-search text-xl"></i>
-          <input class="min-w-0 flex-1 bg-transparent text-sm text-sq-text outline-none" placeholder="Search leads...">
-        </label>
+          <div class="flex flex-col gap-3 md:flex-row md:items-center">
+            <label class="flex h-10 w-full items-center gap-3 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sq-muted md:w-80">
+              <i class="uil uil-search text-xl"></i>
+              <input
+                class="min-w-0 flex-1 bg-transparent text-sm text-sq-text outline-none"
+                placeholder="Search leads..."
+                [value]="searchTerm"
+                (input)="onSearch($event)"
+              >
+            </label>
 
-        <div class="flex flex-wrap gap-2">
-          <button class="flex h-10 items-center gap-2 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sm text-sq-text">
-            Status: <span class="font-semibold">All</span>
-            <i class="uil uil-angle-down text-lg text-sq-muted"></i>
-          </button>
-          <button class="flex h-10 items-center gap-2 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sm text-sq-text">
-            Date: <span class="font-semibold">Last 30 Days</span>
-            <i class="uil uil-angle-down text-lg text-sq-muted"></i>
-          </button>
+            <button class="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-sq-line bg-white px-3 text-sm font-medium text-sq-text shadow-sm" type="button">
+              <i class="uil uil-sliders-v-alt text-lg text-sq-muted"></i>
+              Status
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div class="sq-panel mt-4 overflow-hidden rounded-sq">
-        <div class="overflow-x-auto">
-          <table class="w-full min-w-[760px] border-collapse text-left text-sm">
-            <thead class="bg-sq-panel-soft text-sq-text">
+      @if (errorMessage) {
+        <p class="shrink-0 border-b border-sq-line bg-sq-wine-soft px-5 py-3 text-sm text-sq-red">{{ errorMessage }}</p>
+      }
+
+      <div class="min-h-0 flex-1 overflow-hidden">
+        <div class="h-full overflow-x-auto">
+          <table class="w-full min-w-[820px] border-collapse text-left text-sm">
+            <thead class="sticky top-0 z-10 bg-sq-panel-soft text-sq-muted">
               <tr class="border-b border-sq-line">
-                <th class="w-10 px-3 py-3">
-                  <span class="block size-4 rounded border border-sq-line"></span>
-                </th>
-                <th class="px-3 py-3 font-semibold">Name <i class="uil uil-arrow-up text-sq-muted"></i></th>
-                <th class="px-3 py-3 font-semibold">Company <i class="uil uil-sort text-sq-muted"></i></th>
-                <th class="px-3 py-3 font-semibold">Status <i class="uil uil-sort text-sq-muted"></i></th>
-                <th class="px-3 py-3 font-semibold">Last Contact <i class="uil uil-sort text-sq-muted"></i></th>
-                <th class="px-3 py-3 font-semibold">Source <i class="uil uil-sort text-sq-muted"></i></th>
-                <th class="px-3 py-3 font-semibold">Actions</th>
+                <th class="px-5 py-3 font-semibold">Lead</th>
+                <th class="px-3 py-3 font-semibold">Project</th>
+                <th class="px-3 py-3 font-semibold">Budget</th>
+                <th class="px-3 py-3 font-semibold">Status</th>
+                <th class="px-3 py-3 font-semibold">Last Contact</th>
+                <th class="px-5 py-3 text-right font-semibold">Action</th>
               </tr>
             </thead>
             <tbody class="text-sq-text">
-              @for (lead of leads; track $index) {
-                <tr class="border-b border-sq-line-soft">
-                  <td class="px-3 py-3.5">
-                    <span class="block size-4 rounded border border-sq-line bg-sq-bg-soft"></span>
+              @for (lead of paginatedLeads; track lead._id) {
+                <tr class="group border-b border-sq-line-soft transition hover:bg-sq-bg-soft" [class.bg-sq-primary-soft]="selectedLead?._id === lead._id">
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                      <span class="grid size-10 shrink-0 place-items-center rounded-md bg-sq-primary-soft text-sm font-bold text-sq-primary">
+                        {{ lead.name ? lead.name.charAt(0).toUpperCase() : '?' }}
+                      </span>
+                      <div class="min-w-0">
+                        <p class="truncate font-semibold text-sq-text">{{ lead.name || 'Unnamed lead' }}</p>
+                        <p class="truncate text-xs text-sq-muted">{{ lead.business || lead.email || 'No business captured' }}</p>
+                      </div>
+                    </div>
                   </td>
-                  <td class="px-3 py-3.5 font-medium">{{ lead.name }}</td>
-                  <td class="px-3 py-3.5">{{ lead.company }}</td>
-                  <td class="px-3 py-3.5" [ngClass]="statusClass(lead.status)">{{ lead.status }}</td>
-                  <td class="px-3 py-3.5">{{ lead.lastContact }}</td>
-                  <td class="px-3 py-3.5">{{ lead.source }}</td>
-                  <td class="px-3 py-3.5">
-                    <button class="inline-flex items-center gap-2 text-sq-primary">
-                      <i class="uil uil-eye text-lg"></i>
+                  <td class="px-3 py-4">
+                    <p class="font-medium text-sq-text">{{ lead.projectType || 'Not specified' }}</p>
+                    <p class="mt-1 text-xs text-sq-muted">{{ lead.timeline || 'Timeline pending' }}</p>
+                  </td>
+                  <td class="px-3 py-4">{{ lead.budget || 'Not specified' }}</td>
+                  <td class="px-3 py-4">
+                    <span class="lead-status" [ngClass]="statusPillClass(lead.status)">{{ displayStatus(lead.status) }}</span>
+                  </td>
+                  <td class="px-3 py-4 text-sq-muted">{{ formatDateTime(lead.createdAt) }}</td>
+                  <td class="px-5 py-4 text-right">
+                    <button class="lead-view-button" type="button" (click)="selectLead(lead)">
+                      <i class="uil uil-comment-alt-lines text-lg"></i>
                       View
                     </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="px-5 py-16 text-center text-sq-muted">
+                    @if (isLoading) {
+                      Loading leads...
+                    } @else {
+                      No leads found.
+                    }
                   </td>
                 </tr>
               }
@@ -61,72 +90,106 @@
         </div>
       </div>
 
-      <div class="mt-4 flex flex-col gap-3 text-sq-muted md:flex-row md:items-center md:justify-between">
-        <p class="text-sm">Showing 1 to 10 of 45 leads</p>
-        <div class="flex flex-wrap gap-2">
-          <button class="h-9 rounded-md border border-sq-line px-4 text-sm">Previous</button>
-          <button class="grid size-9 place-items-center rounded-md bg-sq-primary text-sm font-semibold text-white">1</button>
-          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">2</button>
-          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">3</button>
-          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">4</button>
-          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">5</button>
-          <button class="h-9 rounded-md border border-sq-line px-4 text-sm">Next</button>
-        </div>
-      </div>
+      <footer class="shrink-0 border-t border-sq-line px-5 py-3">
+        @if (shouldPaginate) {
+          <div class="flex flex-col gap-3 text-sm text-sq-muted md:flex-row md:items-center md:justify-between">
+            <p>Page {{ currentPage }} of {{ totalPages }}</p>
+            <div class="flex flex-wrap items-center gap-2">
+              <button class="page-button page-button-wide" type="button" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">
+                <i class="uil uil-angle-left text-lg"></i>
+                Previous
+              </button>
+              @for (page of pageNumbers; track page) {
+                <button class="page-button" type="button" [class.page-button-active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+              }
+              <button class="page-button page-button-wide" type="button" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">
+                Next
+                <i class="uil uil-angle-right text-lg"></i>
+              </button>
+            </div>
+          </div>
+        } @else {
+          <p class="text-sm text-sq-muted">{{ filteredLeads.length }} lead{{ filteredLeads.length === 1 ? '' : 's' }}</p>
+        }
+      </footer>
     </div>
 
-    <aside class="sq-panel flex min-h-[calc(100vh-3rem)] flex-col rounded-none border-y-0 border-r-0 p-6 xl:-mr-12 xl:-my-6">
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h2 class="text-2xl font-bold text-sq-text">{{ selectedLead.name }}</h2>
-          <p class="mt-1 text-sm text-sq-muted">{{ selectedLead.business }}</p>
-        </div>
-        <button class="grid size-9 place-items-center text-2xl text-sq-muted">
-          <i class="uil uil-times"></i>
-        </button>
-      </div>
-
-      <div class="mt-5 space-y-3 text-sm text-sq-text">
-        <p><span class="text-sq-muted">Email:</span> {{ selectedLead.email }}</p>
-        <p><span class="text-sq-muted">Phone:</span> {{ selectedLead.phone }}</p>
-        <div class="flex items-center justify-between gap-4">
-          <p><span class="text-sq-muted">Budget:</span> {{ selectedLead.budget }}</p>
-          <button class="flex h-9 items-center gap-2 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sm text-sq-text">
-            Status: <span>{{ selectedLead.status }}</span>
-            <i class="uil uil-angle-down text-lg text-sq-muted"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="mt-7 border-t border-sq-line pt-6">
-        <h3 class="text-xl font-bold text-sq-text">Conversation History</h3>
-      </div>
-
-      <div class="mt-5 h-96 overflow-y-auto pr-2">
-        <div class="space-y-4">
-          @for (message of conversation; track $index) {
-            <div class="flex flex-col" [class.items-end]="message.sender === 'Kofi'">
-              <p
-                class="max-w-[86%] rounded-lg px-3 py-2 text-sm leading-5"
-                [ngClass]="message.sender === 'AI' ? 'bg-sq-primary-soft text-sq-text border border-purple-100' : 'bg-sq-panel-soft text-sq-text border border-sq-line'"
-              >
-                <span class="font-semibold">{{ message.sender }}:</span>
-                {{ message.body }}
-              </p>
-              <span class="mt-1 text-xs text-sq-muted">{{ message.time }}</span>
+    @if (selectedLead; as lead) {
+      <aside class="lead-detail-panel flex min-h-0 flex-col overflow-hidden rounded-sq border border-sq-line bg-white shadow-sq-card">
+        <header class="shrink-0 border-b border-sq-line px-5 py-4">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <span class="lead-status" [ngClass]="statusPillClass(lead.status)">{{ displayStatus(lead.status) }}</span>
+              <h2 class="mt-3 truncate text-2xl font-bold text-sq-text">{{ lead.name || 'Unnamed lead' }}</h2>
+              <p class="mt-1 truncate text-sm text-sq-muted">{{ lead.business || 'Business not captured' }}</p>
             </div>
-          }
-        </div>
-      </div>
+            <button class="panel-icon-button" type="button" aria-label="Close lead details" (click)="closeLeadPanel()">
+              <i class="uil uil-times"></i>
+            </button>
+          </div>
 
-      <div class="mt-auto flex flex-wrap gap-2 border-t border-sq-line pt-4">
-        <button class="rounded-md bg-sq-primary px-4 py-2 text-sm font-semibold text-white">Mark as Booked</button>
-        <button class="rounded-md bg-sq-red px-4 py-2 text-sm font-semibold text-white">Close Lead</button>
-        <button class="inline-flex items-center gap-2 rounded-md border border-sq-text px-4 py-2 text-sm font-semibold text-sq-text">
-          <i class="uil uil-envelope"></i>
-          Send Email
-        </button>
-      </div>
-    </aside>
+          <div class="mt-5 grid grid-cols-2 gap-3 text-sm">
+            <a class="detail-chip" [href]="'mailto:' + lead.email">
+              <i class="uil uil-envelope text-lg text-sq-primary"></i>
+              <span class="truncate">{{ lead.email || 'No email' }}</span>
+            </a>
+            <a class="detail-chip" [href]="'tel:' + lead.phone">
+              <i class="uil uil-phone text-lg text-sq-primary"></i>
+              <span class="truncate">{{ lead.phone || 'No phone' }}</span>
+            </a>
+            <div class="detail-chip">
+              <i class="uil uil-briefcase-alt text-lg text-sq-primary"></i>
+              <span class="truncate">{{ lead.projectType || 'Project pending' }}</span>
+            </div>
+            <div class="detail-chip">
+              <i class="uil uil-wallet text-lg text-sq-primary"></i>
+              <span class="truncate">{{ lead.budget || 'Budget pending' }}</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="shrink-0 border-b border-sq-line px-5 py-4">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <h3 class="font-semibold text-sq-text">Conversation</h3>
+              <p class="mt-1 text-xs text-sq-muted">{{ lead.conversation.length }} message{{ lead.conversation.length === 1 ? '' : 's' }}</p>
+            </div>
+            <span class="rounded-md bg-sq-bg-soft px-3 py-2 text-xs font-medium text-sq-muted">{{ formatDateTime(lead.createdAt) }}</span>
+          </div>
+        </div>
+
+        <div class="conversation-scroll min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          <div class="space-y-4">
+            @for (message of lead.conversation; track $index) {
+              <div class="flex flex-col" [class.items-end]="isCustomerMessage(message)">
+                <p
+                  class="message-bubble"
+                  [ngClass]="isCustomerMessage(message) ? 'message-bubble-user' : 'message-bubble-ai'"
+                >
+                  <span class="mb-1 block text-xs font-bold uppercase tracking-wide">{{ conversationSender(message) }}</span>
+                  {{ conversationBody(message) }}
+                </p>
+                <span class="mt-1 text-xs text-sq-muted">{{ conversationTime(message) }}</span>
+              </div>
+            } @empty {
+              <p class="rounded-md border border-dashed border-sq-line bg-sq-bg-soft px-4 py-6 text-center text-sm text-sq-muted">No conversation history yet.</p>
+            }
+          </div>
+        </div>
+
+        <footer class="shrink-0 border-t border-sq-line bg-sq-bg-soft px-5 py-4">
+          <div class="grid gap-2 sm:grid-cols-2">
+            <button class="action-button action-button-primary" type="button" [disabled]="isUpdatingStatus" (click)="updateSelectedLeadStatus('booked')">
+              <i class="uil uil-calendar-check text-lg"></i>
+              Book consultation
+            </button>
+            <button class="action-button action-button-danger" type="button" [disabled]="isUpdatingStatus" (click)="updateSelectedLeadStatus('closed')">
+              <i class="uil uil-archive-alt text-lg"></i>
+              Archive lead
+            </button>
+          </div>
+        </footer>
+      </aside>
+    }
   </div>
 </section>

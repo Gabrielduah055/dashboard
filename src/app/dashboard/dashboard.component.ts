@@ -1,21 +1,14 @@
 import { NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+import { Lead } from '../interfaces/lead.interface';
+import { LeadsService } from '../services/leads.service';
 
 type Metric = {
   label: string;
   value: string;
   trend: string;
   tone: string;
-};
-
-type Lead = {
-  name: string;
-  business: string;
-  projectType: string;
-  budget: string;
-  status: string;
-  statusClass: string;
-  date: string;
 };
 
 type Activity = {
@@ -30,30 +23,94 @@ type Activity = {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
-  readonly metrics: Metric[] = [
-    { label: 'Total Leads', value: '1,284', trend: '+12%', tone: 'sq-stat-primary' },
-    { label: 'New Today', value: '42', trend: '+5%', tone: 'sq-stat-wine' },
-    { label: 'Qualified', value: '892', trend: '+8%', tone: 'sq-stat-purple' },
-    { label: 'Booked Calls', value: '18', trend: '+2', tone: 'sq-stat-orange' }
-  ];
+export class DashboardComponent implements OnInit {
+  metrics: Metric[] = this.buildMetrics([]);
+  recentLeads: Lead[] = [];
+  isLoading = true;
+  errorMessage = '';
 
-  readonly leads: Lead[] = [
-    { name: 'Kofi Mensah', business: 'TechWave Ghana', projectType: 'E-commerce', budget: '\u20b55,000-10,000', status: 'New', statusClass: 'bg-sq-wine', date: 'Oct 26' },
-    { name: 'Ama Owusu', business: 'Owusu Logistics', projectType: 'Web Redesign', budget: '\u20b53,000-5,000', status: 'Qualified', statusClass: 'bg-sq-primary', date: 'Oct 26' },
-    { name: 'Kwame Boateng', business: 'Boateng Real Estate', projectType: 'SEO & Content', budget: '\u20b58,000+', status: 'Contacted', statusClass: 'bg-sq-purple', date: 'Oct 25' },
-    { name: 'Akosua Osei', business: 'Osei Law Firm', projectType: 'Branding & Web', budget: '\u20b510,000+', status: 'In Progress', statusClass: 'bg-sq-gold', date: 'Oct 25' },
-    { name: 'Yaw Addo', business: 'Addo Constructions', projectType: 'Landing Page', budget: '\u20b52,000-4,000', status: 'Closed', statusClass: 'bg-sq-red', date: 'Oct 24' }
-  ];
-
-  readonly activities: Activity[] = [
-    { title: 'New lead captured: Kofi Mensah', time: '10:15 AM', color: 'bg-sq-primary' },
-    { title: 'AI Qualified: Ama Owusu', time: '9:45 AM', color: 'bg-sq-purple' },
-    { title: 'Booking scheduled with Kwame Boateng', time: 'Oct 25, 4:30 PM', color: 'bg-sq-wine' },
-    { title: 'Proposal sent to Akosua Osei', time: 'Oct 25, 2:15 PM', color: 'bg-sq-gold' },
-    { title: 'Lead marked as closed: Yaw Addo', time: 'Oct 24, 11:00 AM', color: 'bg-sq-red' }
-  ];
+  activities: Activity[] = [];
 
   readonly conversionBars = ['h-11', 'h-16', 'h-20', 'h-14', 'h-16', 'h-12', 'h-14', 'h-17', 'h-12', 'h-12', 'h-18', 'h-14'];
   readonly activeBars = new Set([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11]);
+
+  constructor(private readonly leadsService: LeadsService) {}
+
+  ngOnInit(): void {
+    this.leadsService.getLeads().subscribe({
+      next: (leads) => {
+        this.recentLeads = leads.slice(0, 5);
+        this.metrics = this.buildMetrics(leads);
+        this.activities = this.buildActivities(leads);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to fetch leads:', err);
+        this.errorMessage = 'Failed to fetch leads from the backend.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  statusClass(status: string): string {
+    const normalizedStatus = status.toLowerCase();
+
+    if (normalizedStatus === 'qualified') {
+      return 'bg-sq-primary';
+    }
+
+    if (normalizedStatus === 'booked') {
+      return 'bg-sq-purple';
+    }
+
+    if (normalizedStatus === 'closed') {
+      return 'bg-sq-red';
+    }
+
+    if (normalizedStatus === 'in progress' || normalizedStatus === 'contacted') {
+      return 'bg-sq-gold';
+    }
+
+    return 'bg-sq-wine';
+  }
+
+  displayStatus(status: string): string {
+    return status
+      .split(/[\s_-]+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+
+  formatDate(dateValue: string): string {
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'N/A';
+    }
+
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  private buildMetrics(leads: Lead[]): Metric[] {
+    const today = new Date().toDateString();
+    const qualified = leads.filter((lead) => lead.status.toLowerCase() === 'qualified').length;
+    const booked = leads.filter((lead) => lead.status.toLowerCase() === 'booked').length;
+    const newToday = leads.filter((lead) => new Date(lead.createdAt).toDateString() === today).length;
+
+    return [
+      { label: 'Total Leads', value: leads.length.toLocaleString(), trend: `${leads.length}`, tone: 'sq-stat-primary' },
+      { label: 'New Today', value: newToday.toLocaleString(), trend: `${newToday}`, tone: 'sq-stat-wine' },
+      { label: 'Qualified', value: qualified.toLocaleString(), trend: `${qualified}`, tone: 'sq-stat-purple' },
+      { label: 'Booked Calls', value: booked.toLocaleString(), trend: `${booked}`, tone: 'sq-stat-orange' }
+    ];
+  }
+
+  private buildActivities(leads: Lead[]): Activity[] {
+    return leads.slice(0, 5).map((lead) => ({
+      title: `Lead captured: ${lead.name}`,
+      time: this.formatDate(lead.createdAt),
+      color: this.statusClass(lead.status)
+    }));
+  }
 }
