@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.agent-avatar {
+  background: var(--color-sq-primary);
+  box-shadow: 0 10px 20px rgb(124 58 237 / 0.15);
+}
+
+.agent-bubble {
+  border: 1px solid #e9d5ff;
+  background: var(--color-sq-primary-soft);
+  color: var(--color-sq-text);
+}
+
+.user-bubble {
+  border: 1px solid var(--color-sq-line);
+  background: var(--color-sq-panel-soft);
+  color: var(--color-sq-text);
+}
+
+.composer {
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
+}

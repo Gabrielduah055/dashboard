@@ -1,0 +1,114 @@
+<section class="mx-auto max-w-7xl">
+  <header>
+    <h1 class="text-2xl font-bold tracking-normal text-sq-text sm:text-3xl">SiteQueue Agent &amp; API Settings</h1>
+    <nav class="mt-2 flex items-center gap-2 text-sm text-sq-muted">
+      <span>Home</span>
+      <i class="uil uil-angle-right"></i>
+      <span>Settings</span>
+      <i class="uil uil-angle-right"></i>
+      <span class="font-medium text-sq-text">Agent &amp; API</span>
+    </nav>
+  </header>
+
+  <div class="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(420px,0.95fr)]">
+    <article class="sq-panel rounded-sq p-5 sm:p-6">
+      <h2 class="text-2xl font-bold text-sq-text">Agent Settings</h2>
+
+      <form class="mt-5 space-y-4">
+        <label class="block">
+          <span class="settings-label">Agent Name</span>
+          <input class="settings-field mt-2 h-10" [(ngModel)]="agentName" name="agentName" placeholder="Enter agent name...">
+        </label>
+
+        <label class="block">
+          <span class="settings-label">System Prompt</span>
+          <textarea
+            class="settings-field mt-2 min-h-32 resize-y py-3"
+            [(ngModel)]="systemPrompt"
+            name="systemPrompt"
+            placeholder="You are a helpful assistant for SiteQueue users..."
+          ></textarea>
+        </label>
+
+        <div>
+          <span class="settings-label">Model</span>
+          <div class="model-menu mt-2">
+            <button class="flex h-10 w-full items-center justify-between rounded-md border border-sq-primary bg-sq-panel-soft px-3 text-left text-sm text-sq-text" type="button">
+              {{ selectedModel }}
+              <i class="uil uil-angle-down text-lg text-sq-muted"></i>
+            </button>
+            <div class="overflow-hidden rounded-b-md border border-t-0 border-sq-line bg-sq-bg-soft">
+              <button class="block w-full px-3 py-2 text-left text-sm text-sq-text" type="button">Claude</button>
+              <button class="block w-full px-3 py-2 text-left text-sm text-sq-text" type="button">Qwen</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-1">
+          <button class="settings-primary-button" type="button">Save Agent Settings</button>
+        </div>
+      </form>
+    </article>
+
+    <div class="space-y-6">
+      <article class="sq-panel rounded-sq p-5 sm:p-6">
+        <h2 class="text-2xl font-bold text-sq-text">Notification Settings</h2>
+
+        <div class="mt-5 space-y-6">
+          <label class="flex items-start gap-3">
+            <input class="sr-only" type="checkbox" [(ngModel)]="emailNotifications">
+            <span class="settings-toggle" [class.is-on]="emailNotifications"><span></span></span>
+            <span>
+              <span class="block text-sm font-semibold text-sq-text">Email Notifications</span>
+              <span class="mt-2 block text-sm text-sq-muted">Receive alerts via email for important events.</span>
+            </span>
+          </label>
+
+          <label class="flex items-start gap-3">
+            <input class="sr-only" type="checkbox" [(ngModel)]="soundNotifications">
+            <span class="settings-toggle" [class.is-on]="soundNotifications"><span></span></span>
+            <span>
+              <span class="block text-sm font-semibold text-sq-text">Sound Notifications</span>
+              <span class="mt-2 block text-sm text-sq-muted">Play a sound for new messages and alerts.</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+          <button class="settings-primary-button" type="button">Save Notification Settings</button>
+        </div>
+      </article>
+
+      <article class="sq-panel rounded-sq p-5 sm:p-6">
+        <h2 class="text-2xl font-bold text-sq-text">API Settings</h2>
+
+        <div class="mt-5 space-y-6">
+          <label class="block">
+            <span class="settings-label">OpenRouter API Key</span>
+            <span class="settings-field mt-2 flex h-10 items-center gap-3">
+              <input class="min-w-0 flex-1 bg-transparent text-sm text-sq-text outline-none" [value]="displayedApiKey" readonly>
+              <button class="grid size-8 place-items-center text-xl text-sq-muted" type="button" (click)="toggleApiKeyVisibility()">
+                <i class="uil" [class.uil-eye]="!apiKeyVisible" [class.uil-eye-slash]="apiKeyVisible"></i>
+              </button>
+            </span>
+          </label>
+
+          <div>
+            <span class="settings-label">Connection Status</span>
+            <div class="mt-2 flex h-14 items-center justify-between rounded-md border border-sq-line bg-sq-bg-soft px-4">
+              <span class="text-sm font-medium text-sq-text">MongoDB</span>
+              <span class="flex items-center gap-2 text-sm font-medium text-sq-wine">
+                <span class="size-3 rounded-full bg-sq-wine"></span>
+                Connected
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 flex justify-end">
+          <button class="settings-primary-button" type="button">Save API Settings</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

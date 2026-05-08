@@ -1,0 +1,132 @@
+<section class="mx-auto max-w-[1180px] xl:max-w-none">
+  <div class="grid min-h-[calc(100vh-3rem)] gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
+    <div class="min-w-0 border-t border-sq-line pt-7 xl:border-r xl:pr-5">
+      <h1 class="text-3xl font-bold tracking-normal text-sq-text">All Leads</h1>
+
+      <div class="mt-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <label class="flex h-10 w-full items-center gap-3 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sq-muted lg:max-w-72">
+          <i class="uil uil-search text-xl"></i>
+          <input class="min-w-0 flex-1 bg-transparent text-sm text-sq-text outline-none" placeholder="Search leads...">
+        </label>
+
+        <div class="flex flex-wrap gap-2">
+          <button class="flex h-10 items-center gap-2 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sm text-sq-text">
+            Status: <span class="font-semibold">All</span>
+            <i class="uil uil-angle-down text-lg text-sq-muted"></i>
+          </button>
+          <button class="flex h-10 items-center gap-2 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sm text-sq-text">
+            Date: <span class="font-semibold">Last 30 Days</span>
+            <i class="uil uil-angle-down text-lg text-sq-muted"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="sq-panel mt-4 overflow-hidden rounded-sq">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[760px] border-collapse text-left text-sm">
+            <thead class="bg-sq-panel-soft text-sq-text">
+              <tr class="border-b border-sq-line">
+                <th class="w-10 px-3 py-3">
+                  <span class="block size-4 rounded border border-sq-line"></span>
+                </th>
+                <th class="px-3 py-3 font-semibold">Name <i class="uil uil-arrow-up text-sq-muted"></i></th>
+                <th class="px-3 py-3 font-semibold">Company <i class="uil uil-sort text-sq-muted"></i></th>
+                <th class="px-3 py-3 font-semibold">Status <i class="uil uil-sort text-sq-muted"></i></th>
+                <th class="px-3 py-3 font-semibold">Last Contact <i class="uil uil-sort text-sq-muted"></i></th>
+                <th class="px-3 py-3 font-semibold">Source <i class="uil uil-sort text-sq-muted"></i></th>
+                <th class="px-3 py-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="text-sq-text">
+              @for (lead of leads; track $index) {
+                <tr class="border-b border-sq-line-soft">
+                  <td class="px-3 py-3.5">
+                    <span class="block size-4 rounded border border-sq-line bg-sq-bg-soft"></span>
+                  </td>
+                  <td class="px-3 py-3.5 font-medium">{{ lead.name }}</td>
+                  <td class="px-3 py-3.5">{{ lead.company }}</td>
+                  <td class="px-3 py-3.5" [ngClass]="statusClass(lead.status)">{{ lead.status }}</td>
+                  <td class="px-3 py-3.5">{{ lead.lastContact }}</td>
+                  <td class="px-3 py-3.5">{{ lead.source }}</td>
+                  <td class="px-3 py-3.5">
+                    <button class="inline-flex items-center gap-2 text-sq-primary">
+                      <i class="uil uil-eye text-lg"></i>
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-3 text-sq-muted md:flex-row md:items-center md:justify-between">
+        <p class="text-sm">Showing 1 to 10 of 45 leads</p>
+        <div class="flex flex-wrap gap-2">
+          <button class="h-9 rounded-md border border-sq-line px-4 text-sm">Previous</button>
+          <button class="grid size-9 place-items-center rounded-md bg-sq-primary text-sm font-semibold text-white">1</button>
+          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">2</button>
+          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">3</button>
+          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">4</button>
+          <button class="grid size-9 place-items-center rounded-md border border-sq-line text-sm text-sq-text">5</button>
+          <button class="h-9 rounded-md border border-sq-line px-4 text-sm">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sq-panel flex min-h-[calc(100vh-3rem)] flex-col rounded-none border-y-0 border-r-0 p-6 xl:-mr-12 xl:-my-6">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-sq-text">{{ selectedLead.name }}</h2>
+          <p class="mt-1 text-sm text-sq-muted">{{ selectedLead.business }}</p>
+        </div>
+        <button class="grid size-9 place-items-center text-2xl text-sq-muted">
+          <i class="uil uil-times"></i>
+        </button>
+      </div>
+
+      <div class="mt-5 space-y-3 text-sm text-sq-text">
+        <p><span class="text-sq-muted">Email:</span> {{ selectedLead.email }}</p>
+        <p><span class="text-sq-muted">Phone:</span> {{ selectedLead.phone }}</p>
+        <div class="flex items-center justify-between gap-4">
+          <p><span class="text-sq-muted">Budget:</span> {{ selectedLead.budget }}</p>
+          <button class="flex h-9 items-center gap-2 rounded-md border border-sq-line bg-sq-bg-soft px-3 text-sm text-sq-text">
+            Status: <span>{{ selectedLead.status }}</span>
+            <i class="uil uil-angle-down text-lg text-sq-muted"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-7 border-t border-sq-line pt-6">
+        <h3 class="text-xl font-bold text-sq-text">Conversation History</h3>
+      </div>
+
+      <div class="mt-5 h-96 overflow-y-auto pr-2">
+        <div class="space-y-4">
+          @for (message of conversation; track $index) {
+            <div class="flex flex-col" [class.items-end]="message.sender === 'Kofi'">
+              <p
+                class="max-w-[86%] rounded-lg px-3 py-2 text-sm leading-5"
+                [ngClass]="message.sender === 'AI' ? 'bg-sq-primary-soft text-sq-text border border-purple-100' : 'bg-sq-panel-soft text-sq-text border border-sq-line'"
+              >
+                <span class="font-semibold">{{ message.sender }}:</span>
+                {{ message.body }}
+              </p>
+              <span class="mt-1 text-xs text-sq-muted">{{ message.time }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="mt-auto flex flex-wrap gap-2 border-t border-sq-line pt-4">
+        <button class="rounded-md bg-sq-primary px-4 py-2 text-sm font-semibold text-white">Mark as Booked</button>
+        <button class="rounded-md bg-sq-red px-4 py-2 text-sm font-semibold text-white">Close Lead</button>
+        <button class="inline-flex items-center gap-2 rounded-md border border-sq-text px-4 py-2 text-sm font-semibold text-sq-text">
+          <i class="uil uil-envelope"></i>
+          Send Email
+        </button>
+      </div>
+    </aside>
+  </div>
+</section>

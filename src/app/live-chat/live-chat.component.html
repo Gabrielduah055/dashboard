@@ -1,0 +1,54 @@
+<section class="mx-auto max-w-7xl">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <h1 class="text-3xl font-bold tracking-normal text-sq-text">Test Agent</h1>
+    <button class="inline-flex h-11 items-center gap-2 self-start rounded-md bg-sq-primary px-4 text-base font-medium text-white shadow-sq-lift sm:self-auto">
+      <i class="uil uil-sync text-xl"></i>
+      New Conversation
+    </button>
+  </div>
+
+  <article class="sq-panel mt-10 flex min-h-[610px] flex-col rounded-sq p-4 sm:p-5">
+    <div class="flex-1 space-y-7 overflow-y-auto px-1 py-1 sm:px-2">
+      @for (message of messages; track $index) {
+        <div class="flex" [ngClass]="message.role === 'agent' ? 'justify-start' : 'justify-end'">
+          @if (message.role === 'agent') {
+            <div class="flex max-w-4xl items-start gap-3">
+              <span class="agent-avatar grid size-13 shrink-0 place-items-center rounded-full text-3xl text-white">
+                <i class="uil uil-robot"></i>
+              </span>
+              <p class="agent-bubble rounded-sq px-4 py-3 text-base leading-7 text-sq-text">
+                {{ message.body }}
+              </p>
+            </div>
+          } @else {
+            <div class="flex max-w-lg flex-col items-end gap-1">
+              <span class="text-sm text-sq-muted">{{ message.author }}</span>
+              <p class="user-bubble rounded-sq px-4 py-3 text-base leading-7 text-sq-text">
+                {{ message.body }}
+              </p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="mt-8 flex items-center gap-2">
+      <label class="composer flex min-h-14 flex-1 items-center gap-3 rounded-sq border border-sq-line px-4">
+        <input class="min-w-0 flex-1 bg-transparent text-base text-sq-text outline-none" placeholder="Type your message here...">
+        <button class="grid size-8 place-items-center text-2xl text-sq-muted" type="button">
+          <i class="uil uil-paperclip"></i>
+        </button>
+        <button class="grid size-8 place-items-center text-2xl text-sq-muted" type="button">
+          <i class="uil uil-smile"></i>
+        </button>
+        <button class="grid size-8 place-items-center text-2xl text-sq-muted" type="button">
+          <i class="uil uil-microphone"></i>
+        </button>
+      </label>
+
+      <button class="grid size-14 shrink-0 place-items-center rounded-sq bg-sq-primary text-3xl text-white shadow-sq-lift" type="button">
+        <i class="uil uil-message"></i>
+      </button>
+    </div>
+  </article>
+</section>

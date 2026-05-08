@@ -1,0 +1,57 @@
+<aside class="sq-sidebar fixed inset-y-0 left-0 hidden w-64 px-6 py-10 lg:flex lg:flex-col">
+  <a routerLink="/dashboard" class="flex items-center gap-3">
+    <span class="grid size-9 place-items-center rounded-md bg-white text-2xl text-sq-primary">
+      <i class="uil uil-bolt"></i>
+    </span>
+    <span class="text-2xl font-bold tracking-normal text-white">SiteQueue</span>
+  </a>
+
+  <nav class="mt-12 flex flex-col gap-2">
+    @for (item of navItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        class="sq-nav-link relative flex items-center gap-3 rounded-md px-3 py-3 text-base font-medium"
+      >
+        <span class="grid size-8 place-items-center text-2xl">
+          <i [class]="item.icon"></i>
+        </span>
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+
+  <div class="mt-auto flex items-center gap-3 border-t border-sq-line pt-5">
+    <span class="grid size-10 place-items-center rounded-full bg-white text-sm font-semibold text-sq-wine">G</span>
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-sm font-medium text-white">Gabriel (Admin)</p>
+    </div>
+    <button class="grid size-8 place-items-center rounded-md border border-transparent text-xl text-sq-muted">
+      <i class="uil uil-arrow-up-right"></i>
+    </button>
+  </div>
+</aside>
+
+<header class="sticky top-0 z-20 border-b border-[#494049] bg-sq-sidebar px-4 py-3 lg:hidden">
+  <div class="flex items-center justify-between gap-3">
+    <a routerLink="/dashboard" class="flex items-center gap-2">
+      <span class="grid size-8 place-items-center rounded-md bg-white text-xl text-sq-primary">
+        <i class="uil uil-bolt"></i>
+      </span>
+      <span class="text-base font-bold text-white">SiteQueue</span>
+    </a>
+  </div>
+
+  <nav class="mt-3 flex gap-2 overflow-x-auto pb-1">
+    @for (item of navItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        class="sq-nav-link shrink-0 rounded-md px-3 py-2 text-sm font-medium"
+      >
+        <i [class]="item.icon"></i>
+        {{ item.label }}
+      </a>
+    }
+  </nav>
+</header>
