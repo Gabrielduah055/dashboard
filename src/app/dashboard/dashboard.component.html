@@ -14,7 +14,15 @@
 
   <div class="mt-5 grid gap-5 xl:grid-cols-12">
     <article class="sq-panel rounded-sq p-5 xl:col-span-9">
-      <h2 class="text-xl font-bold text-sq-text">Recent Leads</h2>
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="text-xl font-bold text-sq-text">Recent Leads</h2>
+        @if (isLoading) {
+          <span class="text-sm text-sq-muted">Loading...</span>
+        }
+      </div>
+      @if (errorMessage) {
+        <p class="mt-4 rounded-md border border-sq-line bg-sq-bg-soft px-3 py-2 text-sm text-sq-red">{{ errorMessage }}</p>
+      }
       <div class="mt-6 overflow-x-auto">
         <table class="w-full min-w-[760px] border-collapse text-left text-sm">
           <thead class="text-sq-muted">
@@ -29,15 +37,19 @@
             </tr>
           </thead>
           <tbody class="text-sq-text">
-            @for (lead of leads; track lead.name) {
+            @for (lead of recentLeads; track lead._id) {
               <tr class="border-b border-sq-line-soft">
                 <td class="py-3.5">{{ lead.name }}</td>
                 <td class="py-3.5">{{ lead.business }}</td>
                 <td class="py-3.5">{{ lead.projectType }}</td>
                 <td class="py-3.5">{{ lead.budget }}</td>
-                <td class="py-3.5"><span class="sq-status" [ngClass]="lead.statusClass">{{ lead.status }}</span></td>
-                <td class="py-3.5">{{ lead.date }}</td>
+                <td class="py-3.5"><span class="sq-status" [ngClass]="statusClass(lead.status)">{{ displayStatus(lead.status) }}</span></td>
+                <td class="py-3.5">{{ formatDate(lead.createdAt) }}</td>
                 <td class="py-3.5 text-center text-xl text-sq-muted"><i class="uil uil-eye"></i></td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="py-8 text-center text-sq-muted">No leads found.</td>
               </tr>
             }
           </tbody>
